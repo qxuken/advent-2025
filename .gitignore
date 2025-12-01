@@ -2,3 +2,8 @@ input.txt
 *.exe
 *.bin
 master.key
+
+
+# Added by cargo
+
+/target
