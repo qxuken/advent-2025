@@ -18,7 +18,7 @@ fn main() -> io::Result<()> {
     let mut file = fs::File::open(file_path)?;
     let mut data = String::new();
     file.read_to_string(&mut data)?;
-    let ranges = data
+    let values = data
         .lines()
         .flat_map(|l| l.split(','))
         .filter_map(|s| s.split_once('-'))
@@ -26,8 +26,9 @@ fn main() -> io::Result<()> {
         .map(|(l, r)| (l.parse::<Size>().unwrap(), r.parse().unwrap()))
         .flat_map(|(l, r)| std::ops::RangeInclusive::new(l, r))
         .filter(|n| contains_patters(n))
-        .sum::<Size>();
-    dbg!(ranges);
+        .collect::<Vec<Size>>();
+    let sum = values.iter().sum::<Size>();
+    println!("sum = {sum}");
     Ok(())
 }
 

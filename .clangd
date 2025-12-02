@@ -1,0 +1,2 @@
+CompileFlags:
+  Add: [-Wall, -Wextra, -Wconversion, -Wsign-conversion, -Wformat, -Wformat=2]
