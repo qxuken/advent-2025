@@ -11,7 +11,7 @@ fn main() -> io::Result<()> {
     let Some(file_path) = args.get(1) else {
         eprintln!(
             "Usage: {} <file_input>",
-            args.first().map(|s| s.as_str()).unwrap_or("day1")
+            args.first().map(|s| s.as_str()).unwrap_or("day2")
         );
         return Err(io::Error::other("file_input missing"));
     };
