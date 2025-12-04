@@ -136,7 +136,7 @@ int main(int argc, char *argv[]) {
 
   unsigned char *buf = NULL;
   size_t n = 0;
-  if (read_entire_file(argv[1], &buf, &n) != 0) {
+  if (!read_entire_file(argv[1], &buf, &n)) {
     perror("Error reading file");
     return EXIT_FAILURE;
   }
