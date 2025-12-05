@@ -8,6 +8,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
+#include "da.h"
 #include "defer.h"
 
 #ifdef _WIN32
@@ -39,23 +40,24 @@ static inline int fu_open_compat(const char *path, int oflag) {
 #else /* non-Windows */
 
 #include <unistd.h>
+
 #define FU_OPEN open
 #define FU_READ read
 #define FU_CLOSE close
 #define FU_FLAGS O_RDONLY
 
-#endif
+#endif /* _WIN32 */
 
-int read_entire_file(const char *path, unsigned char **out_buf,
-                     size_t *out_size) {
-  if (!path || !out_buf || !out_size) {
+static inline int read_entire_file(const char *path, unsigned char **out_buf) {
+  if (!path || !out_buf) {
     return 0;
   }
 
   *out_buf = NULL;
-  *out_size = 0;
+
   int fd;
   int ok = 1;
+
   DeferLoop(fd = FU_OPEN(path, FU_FLAGS), FU_CLOSE(fd)) {
     if (fd < 0) {
       return 0;
@@ -66,25 +68,28 @@ int read_entire_file(const char *path, unsigned char **out_buf,
       ok = 0;
       continue;
     }
+
     size_t size = (size_t)st.st_size;
     if (size == 0) {
       ok = 0;
       continue;
     }
 
-    unsigned char *buf = (unsigned char *)malloc(size);
+    /* Allocate with dynamic array helper */
+    unsigned char *buf = make(unsigned char, size);
     if (!buf) {
       ok = 0;
       continue;
     }
-    *out_buf = buf;
 
+    *out_buf = buf;
     size_t total = 0;
+
     while (total < size && ok) {
       int n = FU_READ(fd, buf + total, (unsigned int)(size - total));
       if (n < 0) {
         *out_buf = NULL;
-        free(buf);
+        da_free(buf);
         ok = 0;
         break;
       }
@@ -93,7 +98,11 @@ int read_entire_file(const char *path, unsigned char **out_buf,
       }
       total += (size_t)n;
     }
-    *out_size = total;
+
+    if (ok) {
+      DA_Header *hdr = da__hdr(buf);
+      hdr->len = total;
+    }
   }
 
   return ok;

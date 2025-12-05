@@ -3,11 +3,12 @@
 
 #include <stdio.h>
 
+#include "debug.h"
+
 #ifndef LOGGER_ENABLED
-#define LOGGER_ENABLED 0
+#define LOGGER_ENABLED DEBUG
 #endif
 
-/* Simple logging macro; name kept as 'log' to match existing code */
 #define log(...)                                                               \
   do {                                                                         \
     if (LOGGER_ENABLED)                                                        \

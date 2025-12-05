@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "../utils/da.h"
 #include "../utils/file.h"
 #include "../utils/log.h"
 
@@ -60,8 +61,7 @@ int main(int argc, char **argv) {
   }
 
   unsigned char *data = NULL;
-  size_t data_size = 0;
-  if (!read_entire_file(argv[1], &data, &data_size)) {
+  if (!read_entire_file(argv[1], &data)) {
     fprintf(stderr, "Error opening file\n");
     return 1;
   }
@@ -70,11 +70,11 @@ int main(int argc, char **argv) {
   m.value = data;
   m.size = 0;
 
-  for (size_t i = 0; i < data_size; ++i) {
+  for (size_t i = 0; i < da_len(data); ++i) {
     unsigned char c = data[i];
     if (c == '\r') {
       fprintf(stderr, "Remove CR from data\n");
-      free(data);
+      da_free(data);
       return 1;
     }
     if (c == '\n') {
@@ -103,6 +103,6 @@ int main(int argc, char **argv) {
 #endif
 
   print_value(counter, "%d");
-  free(data);
+  da_free(data);
   return 0;
 }
