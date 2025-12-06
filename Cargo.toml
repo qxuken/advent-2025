@@ -23,8 +23,22 @@ path = "day4/day4.rs"
 name = "day5"
 path = "day5/day5.rs"
 
+[[bin]]
+name = "day6"
+path = "day6/day6.rs"
+
 [lib]
 path = "utils/lib.rs"
 
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+
+[features]
+perf = []
+
 [dependencies]
 rayon = "1.11.0"
+memmap2 = "0.9"
+memchr = "2.7"

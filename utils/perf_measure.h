@@ -70,11 +70,37 @@ static inline double perf_now_seconds(void) {
 #endif
 }
 
-static inline void perf_log_elapsed(const char *label, const char *file,
-                                    int line, const char *func,
-                                    double start_sec, double end_sec) {
-  double ms = (end_sec - start_sec) * 1000.0;
-  printf("[PERF] %s (%s:%d, %s): %.6f ms\n", label, file, line, func, ms);
+static inline void perf_log_elapsed(const char *label, double start_sec,
+                                    double end_sec) {
+  double sec = end_sec - start_sec;
+  if (sec < 0)
+    sec = 0.0;
+
+  const char *unit = "ms";
+  double val = sec * 1e3;
+  int decimals = 4;
+
+  if (sec < 1e-6) {
+    // < 1 microsecond -> nanoseconds, integer
+    val = sec * 1e9;
+    unit = "ns";
+    printf("[PERF] %s: %.0f%s\n", label, val, unit);
+    return;
+  } else if (sec < 1e-3) {
+    // [1ns, 1ms) -> microseconds
+    val = sec * 1e6;
+    unit = "us";
+    decimals = (val < 10.0) ? 1 : 0;
+  } else {
+    // >= 1ms -> milliseconds
+    val = sec * 1e3;
+    unit = "ms";
+    decimals = (val < 10.0) ? 4 : (val < 100.0 ? 3 : 2); // e.g., 1.9159ms
+  }
+
+  char fmt[32];
+  snprintf(fmt, sizeof(fmt), "[PERF] %%s: %%.%df%%s\n", decimals);
+  printf(fmt, label, val, unit);
 }
 
 #if PERF_ENABLED
@@ -86,8 +112,7 @@ static inline void perf_log_elapsed(const char *label, const char *file,
         double start;                                                          \
       } _perf_ = {0, perf_now_seconds()};                                      \
       !_perf_.done; _perf_.done = 1,                                           \
-        perf_log_elapsed("PerfMeasureLoop", __FILE__, __LINE__, __func__,      \
-                         _perf_.start, perf_now_seconds()))
+        perf_log_elapsed("PerfMeasureLoop", _perf_.start, perf_now_seconds()))
 
 #define PerfMeasureLoopNamed(label)                                            \
   for (                                                                        \
@@ -97,8 +122,7 @@ static inline void perf_log_elapsed(const char *label, const char *file,
         const char *lbl;                                                       \
       } _perf_ = {0, perf_now_seconds(), (label)};                             \
       !_perf_.done; _perf_.done = 1,                                           \
-        perf_log_elapsed(_perf_.lbl, __FILE__, __LINE__, __func__,             \
-                         _perf_.start, perf_now_seconds()))
+        perf_log_elapsed(_perf_.lbl, _perf_.start, perf_now_seconds()))
 
 #else /* PERF_ENABLED == 0: no measurement, no logging */
 

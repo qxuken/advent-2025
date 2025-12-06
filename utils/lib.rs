@@ -11,7 +11,7 @@ macro_rules! debug_println {
 #[macro_export]
 macro_rules! perf {
     ($label:expr, $body:block) => {{
-        if cfg!(debug_assertions) {
+        if cfg!(feature = "perf") {
             use std::time::Instant;
 
             let __label: &str = $label;

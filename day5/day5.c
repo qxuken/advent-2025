@@ -92,11 +92,11 @@ int main(int argc, char *argv[]) {
             if (*(p) == '\n' && *(p + 1) == '\n')
               break;
             RangeInclusive range = {0};
-            if (!parse_next_number(&p, end, &range.left)) {
+            if (!parse_row_number(&p, end, &range.left)) {
               fprintf(stderr, "Unexpected data\n");
               return 1;
             }
-            if (!parse_next_number(&p, end, &range.right)) {
+            if (!parse_row_number(&p, end, &range.right)) {
               fprintf(stderr, "Unexpected data\n");
               return 1;
             }
@@ -119,7 +119,7 @@ int main(int argc, char *argv[]) {
           uint64_t counter = 0;
           while (1) {
             size_t number = 0;
-            if (!parse_next_number(&p, end, &number)) {
+            if (!parse_row_number(&p, end, &number)) {
               break;
             }
             int matched = is_in_ranges(ranges, number);
