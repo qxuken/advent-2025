@@ -9,6 +9,15 @@ macro_rules! debug_println {
 }
 
 #[macro_export]
+macro_rules! debug_block {
+    ($body:block) => {{
+        if cfg!(debug_assertions) {
+            $body
+        }
+    }};
+}
+
+#[macro_export]
 macro_rules! perf {
     ($label:expr, $body:block) => {{
         if cfg!(feature = "perf") {

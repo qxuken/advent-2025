@@ -27,6 +27,10 @@ path = "day5/day5.rs"
 name = "day6"
 path = "day6/day6.rs"
 
+[[bin]]
+name = "day9"
+path = "day9/day9.rs"
+
 [lib]
 path = "utils/lib.rs"
 
@@ -42,3 +46,4 @@ perf = []
 rayon = "1.11.0"
 memmap2 = "0.9"
 memchr = "2.7"
+itertools = "0.14.0"
